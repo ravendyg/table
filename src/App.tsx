@@ -1,28 +1,40 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Cell } from './Components/Cell';
+import { ICell, EColor } from './Models';
+
+const data: ICell = {
+    color: EColor.ORANGE,
+    value: '1',
+    children: [
+        {
+            color: EColor.GREEN,
+            value: '4',
+            children: [{
+                color: EColor.PURPLE,
+                value: '7',
+                children: [],
+            }],
+        }, {
+            color: EColor.GREEN,
+            value: '5',
+            children: [{
+                color: EColor.PURPLE,
+                value: '8',
+                children: [],
+            }],
+        }
+    ],
+}
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div className="App">
+                <Cell cell={data} id='0' />
+            </div>
+        );
+    }
 }
 
 export default App;
