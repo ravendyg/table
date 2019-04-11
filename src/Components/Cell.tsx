@@ -9,7 +9,7 @@ interface IProps {
 interface IState { }
 
 export class Cell extends React.PureComponent<IProps, IState> {
-    renderChildren = (cell: ICell, index: number) => {
+    renderChild = (cell: ICell, index: number) => {
         const id = `${this.props.id}.${index};`
 
         return <Cell
@@ -19,17 +19,37 @@ export class Cell extends React.PureComponent<IProps, IState> {
         />
     }
 
+    renderChildren = (cells: ICell[]) => {
+        if (cells.length === 0) {
+            return null;
+        }
+
+        return <div className='cell--children'>
+            {cells.map(this.renderChild)}
+        </div>
+    }
+
     render() {
         const {
-            cell,
             cell: {
                 value,
+                color,
+                verticalSpan,
+                children,
             },
         } = this.props;
+        const cellStyle = {
+            backgroundColor: color,
+        };
+        const contentStyle = {
+            flexGrow: verticalSpan,
+        };
+        const className = 'cell'
+            + (children.length === 0 ? ' cell--children--no_children' : '');
 
-        return <React.Fragment>
-            <div>{value}</div>
-            {cell.children.map(this.renderChildren)}
-        </React.Fragment>;
+        return <div className={className} style={cellStyle}>
+            <div className='cell--content' style={contentStyle}>{value}</div>
+            {this.renderChildren(children)}
+        </div>;
     }
 }
