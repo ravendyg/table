@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { ICell } from '../Models';
 
+const GRID_UNIT = 100;
+
 interface IProps {
     id: string;
     cell: ICell;
@@ -34,21 +36,28 @@ export class Cell extends React.PureComponent<IProps, IState> {
             cell: {
                 value,
                 color,
-                verticalSpan,
+                verticalSpan = 1,
+                horizontalSpan = 1,
                 children,
             },
         } = this.props;
-        const cellStyle = {
+        let cellStyle: any = {
             backgroundColor: color,
         };
+        // width is completely a product of combined width of all children
+        if (children.length === 0) {
+            // allow 1 px for the border
+            cellStyle.width = `${horizontalSpan * GRID_UNIT - 1}px`;
+        }
         const contentStyle = {
-            flexGrow: verticalSpan,
+            height: `${verticalSpan * GRID_UNIT - 1}px`,
         };
-        const className = 'cell'
-            + (children.length === 0 ? ' cell--children--no_children' : '');
+        const className = 'cell';
 
         return <div className={className} style={cellStyle}>
-            <div className='cell--content' style={contentStyle}>{value}</div>
+            <div className='cell--content' style={contentStyle}>
+                {`${value} - ${horizontalSpan} - ${verticalSpan}`}
+            </div>
             {this.renderChildren(children)}
         </div>;
     }

@@ -7,26 +7,24 @@
 }
 
 .table--body {
-    display: flex;
-    flex-direction: row;
-    /* flex-grow: 1; */
+    display: inline-flex;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
 }
 
 .cell {
     display: flex;
     flex-direction: column;
-    /* flex-grow: 1; */
-    /* TODO: fix border */
-    /* border: 1px solid gray; */
+}
+
+.cell--content {
+    border-left: 1px solid gray;
+    border-top: 1px solid gray;
 }
 
 .cell--children {
     display: flex;
     flex-direction: row;
-    /* flex-grow: 1; */
+    align-items: flex-start;
 }
 
-.cell--children--no_children {
-    /* width: 5rem;
-    height: 5rem; */
-}
