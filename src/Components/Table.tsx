@@ -3,17 +3,20 @@ import { ICell, ITable } from '../Models';
 import { Cell } from './Cell';
 
 interface IProps {
+    id: string;
     table: ITable;
 }
 
 interface IState {}
 
 export class Table extends React.PureComponent<IProps, IState> {
-    renderCell = (cell: ICell, id: number) => {
+    renderCell = (cell: ICell, index: number) => {
+        const tableId = this.props.id;
+        const id = `${tableId}.${index}`;
         return <Cell
-            key={`${id}`}
+            key={id}
             cell={cell}
-            id={`${id}`}
+            id={id}
         />;
     }
 

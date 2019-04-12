@@ -167,10 +167,11 @@ class App extends React.PureComponent {
     render() {
         return (
             <div className="App">
-                {tables.map(table => (
+                {tables.map((table, index) => (
                     <Table
                         key={table.name}
                         table={table}
+                        id={`${index}`}
                     />
                 ))}
             </div>

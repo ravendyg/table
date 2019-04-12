@@ -12,7 +12,7 @@ interface IState { }
 
 export class Cell extends React.PureComponent<IProps, IState> {
     renderChild = (cell: ICell, index: number) => {
-        const id = `${this.props.id}.${index};`
+        const id = `${this.props.id}.${index}`
 
         return <Cell
             key={id}
@@ -40,6 +40,7 @@ export class Cell extends React.PureComponent<IProps, IState> {
                 horizontalSpan = 1,
                 children,
             },
+            id,
         } = this.props;
         let cellStyle: any = {
             backgroundColor: color,
@@ -55,8 +56,13 @@ export class Cell extends React.PureComponent<IProps, IState> {
         const className = 'cell';
 
         return <div className={className} style={cellStyle}>
-            <div className='cell--content' style={contentStyle}>
+            <div
+                className='cell--content'
+                style={contentStyle}
+            >
                 {`${value} - ${horizontalSpan} - ${verticalSpan}`}
+                <br/>
+                {id}
             </div>
             {this.renderChildren(children)}
         </div>;
