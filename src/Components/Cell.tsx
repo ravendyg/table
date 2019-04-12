@@ -42,16 +42,16 @@ export class Cell extends React.PureComponent<IProps, IState> {
 
     render() {
         const {
-            cell: {
-                value,
-                color,
-                verticalSpan = 1,
-                horizontalSpan = 1,
-                children,
-            },
+            cell,
             id,
-            onContext,
         } = this.props;
+        const {
+            value,
+            color,
+            verticalSpan = 1,
+            horizontalSpan = 1,
+            children,
+        } = cell;
         let cellStyle: any = {
             backgroundColor: color,
         };
@@ -71,8 +71,8 @@ export class Cell extends React.PureComponent<IProps, IState> {
                 style={contentStyle}
                 onContextMenu={this.showContext}
             >
-                {`${value} - ${horizontalSpan} - ${verticalSpan}`}
-                <br/>
+                {value}
+                <br />
                 {id}
             </div>
             {this.renderChildren(children)}

@@ -1,6 +1,13 @@
 import React from 'react';
+import update from 'react-addons-update';
 import './App.css';
-import { colors, ITable } from './Models';
+import {
+    colors,
+    ITable,
+    ITrx,
+    ETrxType,
+    ICell,
+} from './Models';
 import { Table } from './Components/Table';
 import { ContextMenu } from './Components/ContextMenu';
 
@@ -60,8 +67,7 @@ const tables: ITable[] = [
                 ],
             },
         ],
-    },
-    {
+    }, {
         name: 'Table 2',
         children: [
             {
@@ -163,21 +169,31 @@ const tables: ITable[] = [
             },
         ],
     },
-]
+];
 
-interface IProps {}
+interface IProps { }
 
 interface IState {
     menuTop: number | null;
     menuLeft: number | null;
     menuId: string | null;
+    tables: ITable[];
+    applied: ITrx[];
+    reverted: ITrx[];
 }
 
 class App extends React.PureComponent<IProps, IState> {
-    state = {
-        menuTop: null,
-        menuLeft: null,
-        menuId: null,
+    constructor(props: IProps) {
+        super(props);
+
+        this.state = {
+            menuTop: null,
+            menuLeft: null,
+            menuId: null,
+            tables,
+            applied: [],
+            reverted: [],
+        };
     }
 
     componentDidMount() {
@@ -194,7 +210,7 @@ class App extends React.PureComponent<IProps, IState> {
             menuTop,
             menuId,
         });
-    }
+    };
 
     hide = () => {
         this.setState({
@@ -202,7 +218,7 @@ class App extends React.PureComponent<IProps, IState> {
             menuTop: null,
             menuId: null,
         });
-    }
+    };
 
     hideContextMenu = (e: Event) => {
         // a hack to avoid handling react and window listeners order
@@ -214,16 +230,160 @@ class App extends React.PureComponent<IProps, IState> {
         }
     }
 
+    applyTrx = (type: ETrxType, target: string) => {
+        const trx: ITrx = {
+            target,
+            type,
+        };
+        const applied = [trx, ...this.state.applied];
+        const ids = target.split('.').map(id => +id);
+
+        let operation: any;
+        // TODO: add comments explaining this mess
+        switch (type) {
+            case ETrxType.INSERT_ABOVE: {
+                operation = {};
+                let nested: any = operation;
+                let targeted: any = this.state.tables;
+                ids.slice(0, ids.length - 1).forEach(id => {
+                    targeted = targeted[id].children;
+                    const children = {};
+                    nested[id] = { children };
+                    nested = children;
+                });
+                targeted = targeted[ids[ids.length - 1]];
+                const newCell: ICell = {
+                    children: [targeted],
+                    color: colors.BLUE,
+                    value: '-1',
+                };
+                nested[ids[ids.length - 1]] = { '$set': newCell };
+                break;
+            }
+
+            case ETrxType.INSERT_BELOW: {
+                operation = {};
+                let nested: any = operation;
+                let targeted: any = this.state.tables;
+                ids.slice(0, ids.length - 1).forEach(id => {
+                    targeted = targeted[id].children;
+                    const children = {};
+                    nested[id] = { children };
+                    nested = children;
+                });
+                targeted = targeted[ids[ids.length - 1]];
+                const newChildren: ICell[] = [{
+                    children: targeted.children,
+                    color: colors.BLUE,
+                    value: '-1',
+                }];
+                nested[ids[ids.length - 1]] = {
+                    children: {
+                        $set: newChildren,
+                    },
+                };
+                break;
+            }
+
+            case ETrxType.INSERT_LEFT: {
+                operation = {};
+                let nested: any = operation;
+                ids.slice(0, ids.length - 1).forEach(id => {
+                    const children = {};
+                    nested[id] = { children };
+                    nested = children;
+                });
+                const newCell: ICell = {
+                    children: [],
+                    color: colors.BLUE,
+                    value: '-1',
+                };
+                nested['$splice'] = [[ids[ids.length - 1], 0, newCell]];
+                break;
+            }
+
+            case ETrxType.INSERT_RIGHT: {
+                operation = {};
+                let nested: any = operation;
+                ids.slice(0, ids.length - 1).forEach(id => {
+                    const children = {};
+                    nested[id] = { children };
+                    nested = children;
+                });
+                const newCell: ICell = {
+                    children: [],
+                    color: colors.BLUE,
+                    value: '-1',
+                };
+                nested['$splice'] = [[ids[ids.length - 1] + 1, 0, newCell]];
+                break;
+            }
+
+            default: {
+                // don't know how to handle - do nothing
+                return;
+            }
+        }
+
+
+        const tables: ITable[] = update(
+            this.state.tables,
+            operation,
+        );
+        // console.log(
+        //     // this.state.tables,
+        //     tables,
+        // );
+        // console.log(operation);
+
+        this.setState({
+            applied,
+            tables,
+        });
+    };
+
+    undo = () => {
+        const [trx, ...applied] = this.state.applied;
+        const reverted = [trx, ...this.state.reverted];
+        console.log('undo:', trx);
+        this.setState({
+            applied,
+            reverted,
+        });
+    };
+
+    redo = () => {
+        const [trx, ...reverted] = this.state.reverted;
+        const applied = [trx, ...this.state.applied];
+        console.log('redo:', trx);
+        this.setState({
+            applied,
+            reverted,
+        });
+    };
+
     render() {
         const {
             menuLeft,
             menuTop,
             menuId,
+            applied,
+            reverted,
         } = this.state;
 
         return (
             <div className="App">
-                {tables.map((table, index) => (
+                <div>
+                    <button
+                        onClick={this.undo}
+                        disabled={applied.length === 0}
+                    >Undo</button>
+                    <button
+                        onClick={this.redo}
+                        disabled={reverted.length === 0}
+                    >Redo</button>
+                </div>
+                {this.state.tables.map((table, index) => (
                     <Table
                         key={table.name}
                         table={table}
@@ -235,6 +395,7 @@ class App extends React.PureComponent<IProps, IState> {
                     left={menuLeft}
                     top={menuTop}
                     id={menuId}
+                    applyTrx={this.applyTrx}
                 />
             </div>
         );

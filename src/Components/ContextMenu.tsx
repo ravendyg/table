@@ -1,29 +1,33 @@
 import * as React from 'react';
+import { ETrxType } from '../Models';
 
 interface IProps {
     top: number | null;
     left: number | null;
     id: string | null;
+    applyTrx: (type: ETrxType, target: string) => void;
 }
 
-interface IState {}
+interface IState { }
 
 export class ContextMenu extends React.PureComponent<IProps, IState> {
-    insertAbove = () => {
-        console.log(`insert above: ${this.props.id}`);
-    }
+    apply = (type: ETrxType) => {
+        const {
+            id,
+            applyTrx,
+        } = this.props;
+        if (id) {
+            applyTrx(type, id);
+        }
+    };
 
-    insertBelow = () => {
-        console.log(`insert below: ${this.props.id}`);
-    }
+    insertAbove = () => this.apply(ETrxType.INSERT_ABOVE);
 
-    insertToTheLeft = () => {
-        console.log(`insert to the left: ${this.props.id}`);
-    }
+    insertBelow = () => this.apply(ETrxType.INSERT_BELOW);
 
-    insertToTheRight = () => {
-        console.log(`insert to the right: ${this.props.id}`);
-    }
+    insertToTheLeft = () => this.apply(ETrxType.INSERT_LEFT);
+
+    insertToTheRight = () => this.apply(ETrxType.INSERT_RIGHT);
 
     render() {
         const {

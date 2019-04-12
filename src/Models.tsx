@@ -18,3 +18,15 @@ export interface ITable {
     name: string;
     children: ICell[];
 }
+
+export enum ETrxType {
+    INSERT_ABOVE = 'INSERT_ABOVE',
+    INSERT_BELOW = 'INSERT_BELOW',
+    INSERT_LEFT = 'INSERT_LEFT',
+    INSERT_RIGHT = 'INSERT_RIGHT',
+}
+
+export interface ITrx {
+    type: ETrxType;
+    target: string;
+}
