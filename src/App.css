@@ -8,8 +8,10 @@
 
 .table--body {
     display: inline-flex;
+    align-items: flex-start;
     border-right: 1px solid gray;
     border-bottom: 1px solid gray;
+    background-color: lightgray;
 }
 
 .cell {
@@ -28,3 +30,27 @@
     align-items: flex-start;
 }
 
+.menu {
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    padding: 25px;
+}
+
+.menu--list {
+    border: 1px solid #ccc;
+    white-space: nowrap;
+    background: #fff;
+    color: #333;
+    border-radius: 5px;
+    text-align: left;
+}
+
+.menu--action {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.menu--action:hover {
+    background-color: #def;
+}

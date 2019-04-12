@@ -6,11 +6,19 @@ const GRID_UNIT = 100;
 interface IProps {
     id: string;
     cell: ICell;
+    onContext: (menuLeft: number, menuTop: number, id: string) => void;
 }
 
 interface IState { }
 
 export class Cell extends React.PureComponent<IProps, IState> {
+    showContext = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.preventDefault();
+        const { pageX, pageY } = e;
+        const { id, onContext } = this.props;
+        onContext(pageX, pageY, id);
+    }
+
     renderChild = (cell: ICell, index: number) => {
         const id = `${this.props.id}.${index}`
 
@@ -18,6 +26,7 @@ export class Cell extends React.PureComponent<IProps, IState> {
             key={id}
             id={id}
             cell={cell}
+            onContext={this.props.onContext}
         />
     }
 
@@ -41,6 +50,7 @@ export class Cell extends React.PureComponent<IProps, IState> {
                 children,
             },
             id,
+            onContext,
         } = this.props;
         let cellStyle: any = {
             backgroundColor: color,
@@ -59,6 +69,7 @@ export class Cell extends React.PureComponent<IProps, IState> {
             <div
                 className='cell--content'
                 style={contentStyle}
+                onContextMenu={this.showContext}
             >
                 {`${value} - ${horizontalSpan} - ${verticalSpan}`}
                 <br/>

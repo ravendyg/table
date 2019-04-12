@@ -5,6 +5,7 @@ import { Cell } from './Cell';
 interface IProps {
     id: string;
     table: ITable;
+    onContext: (menuLeft: number, menuTop: number, id: string) => void;
 }
 
 interface IState {}
@@ -17,6 +18,7 @@ export class Table extends React.PureComponent<IProps, IState> {
             key={id}
             cell={cell}
             id={id}
+            onContext={this.props.onContext}
         />;
     }
 

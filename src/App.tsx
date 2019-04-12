@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import { colors, ITable } from './Models';
 import { Table } from './Components/Table';
+import { ContextMenu } from './Components/ContextMenu';
 
 const tables: ITable[] = [
     {
@@ -68,6 +69,7 @@ const tables: ITable[] = [
                 color: colors.BLUE,
                 children: [],
                 horizontalSpan: 2,
+                verticalSpan: 5,
             }, {
                 value: '2',
                 color: colors.GREEN,
@@ -163,8 +165,62 @@ const tables: ITable[] = [
     },
 ]
 
-class App extends React.PureComponent {
+interface IProps {}
+
+interface IState {
+    menuTop: number | null;
+    menuLeft: number | null;
+    menuId: string | null;
+}
+
+class App extends React.PureComponent<IProps, IState> {
+    state = {
+        menuTop: null,
+        menuLeft: null,
+        menuId: null,
+    }
+
+    componentDidMount() {
+        document.addEventListener('mousedown', this.hideContextMenu);
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('mousedown', this.hideContextMenu);
+    }
+
+    showContextMenu = (menuLeft: number, menuTop: number, menuId: string) => {
+        this.setState({
+            menuLeft,
+            menuTop,
+            menuId,
+        });
+    }
+
+    hide = () => {
+        this.setState({
+            menuLeft: null,
+            menuTop: null,
+            menuId: null,
+        });
+    }
+
+    hideContextMenu = (e: Event) => {
+        // a hack to avoid handling react and window listeners order
+        const target: HTMLDivElement | null = e.target as any;
+        if (target && target.className === 'menu--action') {
+            setTimeout(this.hide);
+        } else {
+            this.hide();
+        }
+    }
+
     render() {
+        const {
+            menuLeft,
+            menuTop,
+            menuId,
+        } = this.state;
+
         return (
             <div className="App">
                 {tables.map((table, index) => (
@@ -172,8 +228,14 @@ class App extends React.PureComponent {
                         key={table.name}
                         table={table}
                         id={`${index}`}
+                        onContext={this.showContextMenu}
                     />
                 ))}
+                <ContextMenu
+                    left={menuLeft}
+                    top={menuTop}
+                    id={menuId}
+                />
             </div>
         );
     }
