@@ -26,7 +26,3 @@ export enum ETrxType {
     INSERT_RIGHT = 'INSERT_RIGHT',
 }
 
-export interface ITrx {
-    type: ETrxType;
-    target: string;
-}

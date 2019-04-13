@@ -4,7 +4,6 @@ import './App.css';
 import {
     colors,
     ITable,
-    ITrx,
     ETrxType,
     ICell,
 } from './Models';
@@ -178,8 +177,11 @@ interface IState {
     menuLeft: number | null;
     menuId: string | null;
     tables: ITable[];
-    applied: ITrx[];
-    reverted: ITrx[];
+    // since we are using immutable data structures
+    // we can hope that `react-addons-update` reuses most of the objects
+    // and there wion't be huge memory usage impact
+    previous: ITable[][];
+    reverted: ITable[][];
 }
 
 class App extends React.PureComponent<IProps, IState> {
@@ -191,7 +193,7 @@ class App extends React.PureComponent<IProps, IState> {
             menuLeft: null,
             menuId: null,
             tables,
-            applied: [],
+            previous: [],
             reverted: [],
         };
     }
@@ -231,11 +233,6 @@ class App extends React.PureComponent<IProps, IState> {
     }
 
     applyTrx = (type: ETrxType, target: string) => {
-        const trx: ITrx = {
-            target,
-            type,
-        };
-        const applied = [trx, ...this.state.applied];
         const ids = target.split('.').map(id => +id);
 
         let operation: any;
@@ -330,35 +327,31 @@ class App extends React.PureComponent<IProps, IState> {
             this.state.tables,
             operation,
         );
-        // console.log(
-        //     // this.state.tables,
-        //     tables,
-        // );
-        // console.log(operation);
+        const previous = [this.state.tables, ...this.state.previous];
 
         this.setState({
-            applied,
+            previous,
             tables,
         });
     };
 
     undo = () => {
-        const [trx, ...applied] = this.state.applied;
-        const reverted = [trx, ...this.state.reverted];
-        console.log('undo:', trx);
+        const [tables, ...previous] = this.state.previous;
+        const reverted = [this.state.tables, ...this.state.reverted];
         this.setState({
-            applied,
+            tables,
+            previous,
             reverted,
         });
     };
 
     redo = () => {
-        const [trx, ...reverted] = this.state.reverted;
-        const applied = [trx, ...this.state.applied];
-        console.log('redo:', trx);
+        const [tables, ...reverted] = this.state.reverted;
+        const previous = [this.state.tables, ...this.state.previous];
         this.setState({
-            applied,
+            previous,
             reverted,
+            tables,
         });
     };
 
@@ -367,7 +360,7 @@ class App extends React.PureComponent<IProps, IState> {
             menuLeft,
             menuTop,
             menuId,
-            applied,
+            previous,
             reverted,
         } = this.state;
 
@@ -376,7 +369,7 @@ class App extends React.PureComponent<IProps, IState> {
                 <div>
                     <button
                         onClick={this.undo}
-                        disabled={applied.length === 0}
+                        disabled={previous.length === 0}
                     >Undo</button>
                     <button
                         onClick={this.redo}
