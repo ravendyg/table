@@ -79,8 +79,9 @@ class App extends React.PureComponent<IProps, IState> {
 
         let operation: any;
 
-        // TODO: add comments explaining this mess
         switch (type) {
+            // find children containing selected cell, replace with an array
+            // containing only one new cell and give to the new cell replaced children
             case ETrxType.INSERT_ABOVE: {
                 operation = {};
                 let nested: any = operation;
@@ -101,6 +102,8 @@ class App extends React.PureComponent<IProps, IState> {
                 break;
             }
 
+            // get children of the selected cell, replace with an array containing only one new cell
+            // add assign this new cell children of the parent
             case ETrxType.INSERT_BELOW: {
                 operation = {};
                 let nested: any = operation;
@@ -125,6 +128,7 @@ class App extends React.PureComponent<IProps, IState> {
                 break;
             }
 
+            // get children containing selected cell, splice before
             case ETrxType.INSERT_LEFT: {
                 operation = {};
                 let nested: any = operation;
@@ -142,6 +146,7 @@ class App extends React.PureComponent<IProps, IState> {
                 break;
             }
 
+            // get children containing selected cell, splice after
             case ETrxType.INSERT_RIGHT: {
                 operation = {};
                 let nested: any = operation;
@@ -156,6 +161,20 @@ class App extends React.PureComponent<IProps, IState> {
                     value: '-1',
                 };
                 nested['$splice'] = [[ids[ids.length - 1] + 1, 0, newCell]];
+                break;
+            }
+
+            // find children containing this cell and splice it
+            case ETrxType.DELETE_CELL: {
+                operation = {};
+                let nested: any = operation;
+                ids.slice(0, ids.length - 1).forEach(id => {
+                    const children = {};
+                    nested[id] = { children };
+                    nested = children;
+                });
+
+                nested['$splice'] = [[ids[ids.length - 1], 1]];
                 break;
             }
 

@@ -29,6 +29,8 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
 
     insertToTheRight = () => this.apply(ETrxType.INSERT_RIGHT);
 
+    deleteCell = () => this.apply(ETrxType.DELETE_CELL);
+
     setVerticalSpan = () => {
         const span = prompt('New vertical span (number)');
         const value = span ? +span : 1;
@@ -95,6 +97,12 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
                     className='menu--action'
                     onMouseDown={this.insertToTheRight}
                 >To the right</li>
+
+                <li className='menu--header'>Delete</li>
+                <li
+                    className='menu--action'
+                    onMouseDown={this.deleteCell}
+                >Cell</li>
 
                 <li className='menu--header'>Change</li>
                 <li
