@@ -44,6 +44,13 @@
     color: #333;
     border-radius: 5px;
     text-align: left;
+    list-style: none;
+}
+
+.menu--header {
+    padding: 8px 12px 8px 0px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .menu--action {
