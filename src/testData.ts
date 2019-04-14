@@ -157,5 +157,61 @@ export const defaultTables: ITable[] = [
                 ],
             },
         ],
+    }, {
+        name: 'Table 4',
+        children: [
+            {
+                value: '1',
+                color: colors.BLUE,
+                children: [],
+                horizontalSpan: 2,
+                verticalSpan: 5,
+            }, {
+                value: '2',
+                color: colors.GREEN,
+                children: [
+                    {
+                        value: '3',
+                        color: colors.ORANGE,
+                        children: [
+                            {
+                                value: '5',
+                                color: colors.RED,
+                                children: [],
+                                horizontalSpan: 2,
+                                verticalSpan: 3,
+                            }, {
+                                value: '6',
+                                color: colors.BLUE,
+                                children: [
+                                    {
+                                        value: '7',
+                                        color: colors.GREEN,
+                                        children: [
+                                            {
+                                                value: '9',
+                                                color: colors.BLUE,
+                                                children: [],
+                                            },
+                                        ],
+                                    }, {
+                                        value: '8',
+                                        color: colors.ORANGE,
+                                        verticalSpan: 2,
+                                        children: [],
+                                    },
+                                ],
+                            },
+                        ],
+                    }, {
+                        value: '4',
+                        color: colors.PURPLE,
+                        horizontalSpan: 2,
+                        verticalSpan: 4,
+                        children: [],
+                    },
+                ],
+            },
+        ],
     },
 ];
