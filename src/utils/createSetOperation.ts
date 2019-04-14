@@ -1,3 +1,4 @@
+// update operations are identical excluding validation
 export function createSetOperation(key: string, ids: number[], payload: string | number) {
     let operation = {};
     let nested: any = operation;

@@ -1,6 +1,6 @@
 import { ITable, colors } from './Models';
 
-export const tables: ITable[] = [
+export const defaultTables: ITable[] = [
     {
         name: 'Table 1',
         children: [
@@ -109,7 +109,7 @@ export const tables: ITable[] = [
             },
         ],
     }, {
-        name: 'Table 3 - like #2 but icorrect',
+        name: 'Table 3 - like #2 but incorrect',
         children: [
             {
                 value: '1',

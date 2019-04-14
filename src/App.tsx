@@ -9,7 +9,7 @@ import {
 } from './Models';
 import { Table } from './Components/Table';
 import { ContextMenu } from './Components/ContextMenu';
-import { tables } from './testData';
+import { defaultTables } from './testData';
 import { createSetOperation } from './utils/createSetOperation';
 
 interface IProps { }
@@ -21,7 +21,7 @@ interface IState {
     tables: ITable[];
     // since we are using immutable data structures
     // we can hope that `react-addons-update` reuses most of the objects
-    // and there wion't be huge memory usage impact
+    // and there won't be huge memory usage problem
     previous: ITable[][];
     reverted: ITable[][];
 }
@@ -29,6 +29,13 @@ interface IState {
 class App extends React.PureComponent<IProps, IState> {
     constructor(props: IProps) {
         super(props);
+
+        let tables: ITable[];
+        try {
+            tables = JSON.parse(localStorage.getItem('tables') || '');
+        } catch {
+            tables = defaultTables;
+        }
 
         this.state = {
             menuTop: null,
@@ -72,6 +79,11 @@ class App extends React.PureComponent<IProps, IState> {
         } else {
             this.hide();
         }
+    }
+
+    updateTablesAndHistory = (tables: ITable[], previous: ITable[][], reverted: ITable[][]) => {
+        this.setState({ tables, previous, reverted });
+        localStorage.setItem('tables', JSON.stringify(tables));
     }
 
     applyTrx = (type: ETrxType, target: string, payload?: string | number) => {
@@ -211,21 +223,13 @@ class App extends React.PureComponent<IProps, IState> {
         );
         const previous = [this.state.tables, ...this.state.previous];
 
-        this.setState({
-            previous,
-            reverted: [],
-            tables,
-        });
+        this.updateTablesAndHistory(tables, previous, [])
     };
 
     undo = () => {
         const [tables, ...previous] = this.state.previous;
         const reverted = [this.state.tables, ...this.state.reverted];
-        this.setState({
-            tables,
-            previous,
-            reverted,
-        });
+        this.updateTablesAndHistory(tables, previous, reverted);
     };
 
     redo = () => {
@@ -237,6 +241,10 @@ class App extends React.PureComponent<IProps, IState> {
             tables,
         });
     };
+
+    reset = () => {
+        this.updateTablesAndHistory(defaultTables, [], []);
+    }
 
     render() {
         const {
@@ -250,6 +258,11 @@ class App extends React.PureComponent<IProps, IState> {
         return (
             <div className="App">
                 <div>
+                    <button
+                        onClick={this.reset}
+                        style={{ marginRight: '20px'}}
+                        title='Cannot be undone'
+                    >Reset</button>
                     <button
                         onClick={this.undo}
                         disabled={previous.length === 0}
