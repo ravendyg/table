@@ -1,3 +1,6 @@
+## Deployed
+https://table.nskgortrans.info/
+
 ## Requirements
 * NodeJS 10+
 * NPM 6+
