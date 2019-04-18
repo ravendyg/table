@@ -10,7 +10,7 @@ import {
 import { Table } from './Components/Table';
 import { ContextMenu } from './Components/ContextMenu';
 import { defaultTables } from './testData';
-import { createSetOperation } from './utils/createSetOperation';
+import { createSetOperation, calculateInsertionDepth, addInsertChildrenOrStretchOperation } from './utils/createSetOperation';
 
 interface IProps { }
 
@@ -95,22 +95,36 @@ class App extends React.PureComponent<IProps, IState> {
             // find children containing selected cell, replace with an array
             // containing only one new cell and give to the new cell replaced children
             case ETrxType.INSERT_ABOVE: {
-                operation = {};
-                let nested: any = operation;
-                let targeted: any = this.state.tables;
-                ids.slice(0, ids.length - 1).forEach(id => {
-                    targeted = targeted[id].children;
-                    const children = {};
-                    nested[id] = { children };
-                    nested = children;
-                });
-                targeted = targeted[ids[ids.length - 1]];
-                const newCell: ICell = {
-                    children: [targeted],
-                    color: colors.BLUE,
-                    value: '-1',
-                };
-                nested[ids[ids.length - 1]] = { '$set': newCell };
+                const { tables } = this.state;
+                operation = [];
+                const tableId = ids[0];
+                const parentIds = ids.slice(0, ids.length - 1);
+                // -1 to compensate for the table itself
+                let targetDepth = calculateInsertionDepth(tables, parentIds);
+                if (targetDepth === 0) {
+                    operation = [{
+                        [tableId]: {
+                            children: {
+                                $set: [{
+                                    children: tables[tableId].children,
+                                    color: colors.BLUE,
+                                    value: -1,
+                                }],
+                            },
+                        },
+                    }];
+                } else {
+                    tables[tableId].children.forEach((cell, index) => {
+                        addInsertChildrenOrStretchOperation(
+                            tables,
+                            cell,
+                            [tableId, index],
+                            0,
+                            targetDepth,
+                            operation,
+                        );
+                    });
+                }
                 break;
             }
 
@@ -219,14 +233,17 @@ class App extends React.PureComponent<IProps, IState> {
             }
         }
 
-
-        const tables: ITable[] = update(
-            this.state.tables,
-            operation,
-        );
+        let _tables = this.state.tables
+        if (Array.isArray(operation)) {
+            operation.forEach(op => {
+                _tables = update(_tables, op);
+            })
+        } else {
+            _tables = update(_tables, operation);
+        }
         const previous = [this.state.tables, ...this.state.previous];
 
-        this.updateTablesAndHistory(tables, previous, [])
+        this.updateTablesAndHistory(_tables, previous, [])
     };
 
     undo = () => {
