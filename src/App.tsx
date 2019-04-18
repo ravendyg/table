@@ -161,8 +161,18 @@ class App extends React.PureComponent<IProps, IState> {
                     children: [],
                     color: colors.BLUE,
                     value: '-1',
-                    verticalSpan: tableDepth - targetDepth,
                 };
+                let nestedCount = tableDepth - targetDepth - 1;
+                let children = newCell.children;
+                while (nestedCount > 0) {
+                    children[0] = {
+                        children: [],
+                        color: colors.BLUE,
+                        value: '-1',
+                    };
+                    children = children[0].children;
+                    nestedCount--;
+                }
                 nested['$splice'] = [[ids[ids.length - 1], 0, newCell]];
                 break;
             }
@@ -183,8 +193,18 @@ class App extends React.PureComponent<IProps, IState> {
                     children: [],
                     color: colors.BLUE,
                     value: '-1',
-                    verticalSpan: tableDepth - targetDepth,
                 };
+                let nestedCount = tableDepth - targetDepth - 1;
+                let children = newCell.children;
+                while (nestedCount > 0) {
+                    children[0] = {
+                        children: [],
+                        color: colors.BLUE,
+                        value: '-1',
+                    };
+                    children = children[0].children;
+                    nestedCount--;
+                }
                 nested['$splice'] = [[ids[ids.length - 1] + 1, 0, newCell]];
                 break;
             }
