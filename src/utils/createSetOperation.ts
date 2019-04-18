@@ -34,6 +34,17 @@ export function calculateInsertionDepth(tables: ITable[], ids: number[]) {
     return depth;
 }
 
+export function calculateTableDepth(table: ITable) {
+    let depth = 0;
+    let nested: any = table.children[0];
+    while (nested) {
+        depth += nested.verticalSpan || 1;
+        nested = nested.children[0];
+    }
+
+    return depth;
+}
+
 export function addInsertChildrenOrStretchOperation(
     tabls: ITable[],
     container: ICell,

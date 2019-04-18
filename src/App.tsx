@@ -10,7 +10,7 @@ import {
 import { Table } from './Components/Table';
 import { ContextMenu } from './Components/ContextMenu';
 import { defaultTables } from './testData';
-import { createSetOperation, calculateInsertionDepth, addInsertChildrenOrStretchOperation } from './utils/createSetOperation';
+import { createSetOperation, calculateInsertionDepth, addInsertChildrenOrStretchOperation, calculateTableDepth } from './utils/createSetOperation';
 
 interface IProps { }
 
@@ -88,14 +88,13 @@ class App extends React.PureComponent<IProps, IState> {
 
     applyTrx = (type: ETrxType, target: string, payload?: string | number) => {
         const ids = target.split('.').map(id => +id);
-
+        const { tables } = this.state;
         let operation: any;
 
         switch (type) {
             // calculate target depth and insert cells at this depth
             // or stretch overlapping cells
             case ETrxType.INSERT_ABOVE: {
-                const { tables } = this.state;
                 operation = [];
                 const tableId = ids[0];
                 const parentIds = ids.slice(0, ids.length - 1);
@@ -130,7 +129,6 @@ class App extends React.PureComponent<IProps, IState> {
             // calculate target depth and insert cells at this depth
             // or stretch overlapping cells
             case ETrxType.INSERT_BELOW: {
-                const { tables } = this.state;
                 operation = [];
                 const tableId = ids[0];
                 let targetDepth = calculateInsertionDepth(tables, ids);
@@ -151,6 +149,9 @@ class App extends React.PureComponent<IProps, IState> {
             case ETrxType.INSERT_LEFT: {
                 operation = {};
                 let nested: any = operation;
+                const parentIds = ids.slice(0, ids.length - 1);
+                let targetDepth = calculateInsertionDepth(tables, parentIds);
+                let tableDepth = calculateTableDepth(tables[ids[0]]);
                 ids.slice(0, ids.length - 1).forEach(id => {
                     const children = {};
                     nested[id] = { children };
@@ -160,6 +161,7 @@ class App extends React.PureComponent<IProps, IState> {
                     children: [],
                     color: colors.BLUE,
                     value: '-1',
+                    verticalSpan: tableDepth - targetDepth,
                 };
                 nested['$splice'] = [[ids[ids.length - 1], 0, newCell]];
                 break;
@@ -169,6 +171,9 @@ class App extends React.PureComponent<IProps, IState> {
             case ETrxType.INSERT_RIGHT: {
                 operation = {};
                 let nested: any = operation;
+                const parentIds = ids.slice(0, ids.length - 1);
+                let targetDepth = calculateInsertionDepth(tables, parentIds);
+                let tableDepth = calculateTableDepth(tables[ids[0]]);
                 ids.slice(0, ids.length - 1).forEach(id => {
                     const children = {};
                     nested[id] = { children };
@@ -178,6 +183,7 @@ class App extends React.PureComponent<IProps, IState> {
                     children: [],
                     color: colors.BLUE,
                     value: '-1',
+                    verticalSpan: tableDepth - targetDepth,
                 };
                 nested['$splice'] = [[ids[ids.length - 1] + 1, 0, newCell]];
                 break;
