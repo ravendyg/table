@@ -92,14 +92,13 @@ class App extends React.PureComponent<IProps, IState> {
         let operation: any;
 
         switch (type) {
-            // find children containing selected cell, replace with an array
-            // containing only one new cell and give to the new cell replaced children
+            // calculate target depth and insert cells at this depth
+            // or stretch overlapping cells
             case ETrxType.INSERT_ABOVE: {
                 const { tables } = this.state;
                 operation = [];
                 const tableId = ids[0];
                 const parentIds = ids.slice(0, ids.length - 1);
-                // -1 to compensate for the table itself
                 let targetDepth = calculateInsertionDepth(tables, parentIds);
                 if (targetDepth === 0) {
                     operation = [{
@@ -128,32 +127,23 @@ class App extends React.PureComponent<IProps, IState> {
                 break;
             }
 
-            // get children of the selected cell, replace with an array containing only one new cell
-            // add assign this new cell children of the parent
+            // calculate target depth and insert cells at this depth
+            // or stretch overlapping cells
             case ETrxType.INSERT_BELOW: {
-                operation = {};
-                let nested: any = operation;
-                let targeted: any = this.state.tables;
-                ids.slice(0, ids.length - 1).forEach(id => {
-                    targeted = targeted[id].children;
-                    const children = {};
-                    nested[id] = { children };
-                    nested = children;
+                const { tables } = this.state;
+                operation = [];
+                const tableId = ids[0];
+                let targetDepth = calculateInsertionDepth(tables, ids);
+                tables[tableId].children.forEach((cell, index) => {
+                    addInsertChildrenOrStretchOperation(
+                        tables,
+                        cell,
+                        [tableId, index],
+                        0,
+                        targetDepth,
+                        operation,
+                    );
                 });
-                targeted = targeted[ids[ids.length - 1]];
-                const newChildren: ICell[] = [{
-                    children: targeted.children,
-                    color: colors.BLUE,
-                    value: '-1',
-                }];
-                if (targeted.horizontalSpan) {
-                    newChildren[0].horizontalSpan = targeted.horizontalSpan;
-                }
-                nested[ids[ids.length - 1]] = {
-                    children: {
-                        $set: newChildren,
-                    },
-                };
                 break;
             }
 
