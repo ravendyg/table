@@ -132,6 +132,9 @@ class App extends React.PureComponent<IProps, IState> {
                     color: colors.BLUE,
                     value: '-1',
                 }];
+                if (targeted.horizontalSpan) {
+                    newChildren[0].horizontalSpan = targeted.horizontalSpan;
+                }
                 nested[ids[ids.length - 1]] = {
                     children: {
                         $set: newChildren,
