@@ -34,7 +34,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
     setVerticalSpan = () => {
         const span = prompt('New vertical span (number)');
         const value = span ? +span : 1;
-        if (span != '' + value) {
+        if (span !== '' + value) {
             alert('Incorrect value');
         } else {
             this.apply(ETrxType.SET_VERTICAL_SPAN, value);
@@ -44,7 +44,7 @@ export class ContextMenu extends React.PureComponent<IProps, IState> {
     setHorizontalSpan = () => {
         const span = prompt('New horizontal span (number)');
         const value = span ? +span : 1;
-        if (span != '' + value) {
+        if (span !== '' + value) {
             alert('Incorrect value');
         } else {
             this.apply(ETrxType.SET_HORIZONTAL_SPAN, value);
