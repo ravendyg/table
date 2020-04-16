@@ -1,5 +1,5 @@
 ## Deployed
-https://table.nskgortrans.info/
+http://table.nskgortrans.info/
 
 ## Requirements
 * NodeJS 10+
